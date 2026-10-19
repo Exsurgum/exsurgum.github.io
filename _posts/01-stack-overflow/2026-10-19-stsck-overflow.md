@@ -115,7 +115,7 @@ void vuln(void)
 void safe(void)
 {
     char buf[16];
-    ssize_t n = read(0, buf, sizeof buf);
+    ssize_t n = read(0, buf, sizeof (buf) );
     if (n < 0)
     {
         perror("read");

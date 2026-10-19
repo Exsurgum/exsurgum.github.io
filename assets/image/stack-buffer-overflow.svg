@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920">
+<title>栈缓冲区溢出示意图</title>
+<desc>高地址在上，低地址在下。假设实际读入20个A，16字节写入buf，另外4字节越界覆盖相邻数据。返回地址尚未覆盖。此图为假设布局，不代表实测偏移。</desc>
+<rect width="1200" height="920" fill="#ffffff"/>
+<text x="60" y="67" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="40" font-weight="600" text-anchor="start" dominant-baseline="central">栈溢出：输入怎样越过缓冲区</text>
+<text x="60" y="127" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="400" text-anchor="start" dominant-baseline="central">假设实际读入 20 个 A，每个 A 占 1 字节</text>
+<text x="570" y="201" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="400" text-anchor="middle" dominant-baseline="central">高地址</text>
+<rect x="290" y="240" width="560" height="100" fill="#f3f6fa"/>
+<text x="570" y="279" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="central">保存的返回地址</text>
+<text x="570" y="316" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400" text-anchor="middle" dominant-baseline="central">尚未覆盖</text>
+<rect x="290" y="340" width="560" height="90" fill="#f3f6fa"/>
+<text x="570" y="385" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="middle" dominant-baseline="central">其他栈上数据（尚未覆盖）</text>
+<rect x="290" y="430" width="560" height="80" fill="#fff0df"/>
+<text x="570" y="470" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="600" text-anchor="middle" dominant-baseline="central">越界的 4 个 A：覆盖相邻数据</text>
+<rect x="290" y="510" width="560" height="210" fill="#e8f2ff"/>
+<text x="570" y="566" fill="#2366a8" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="36" font-weight="600" text-anchor="middle" dominant-baseline="central">buf[16]</text>
+<text x="570" y="620" fill="#2366a8" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="29" font-weight="400" text-anchor="middle" dominant-baseline="central">16 个 A：写在缓冲区内</text>
+<text x="570" y="678" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="middle" dominant-baseline="central">从 buf[0] 处开始写入</text>
+<rect x="290" y="240" width="560" height="480" fill="none" stroke="#a8b4c4" stroke-width="2"/>
+<line x1="290" y1="340" x2="850" y2="340" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="290" y1="430" x2="850" y2="430" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="290" y1="510" x2="850" y2="510" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="905" y1="700" x2="905" y2="463" stroke="#b35b0b" stroke-width="5"/>
+<polygon points="905,445 893,467 917,467" fill="#b35b0b"/>
+<text x="1033" y="557" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">输入写入方向</text>
+<text x="1033" y="598" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="400" text-anchor="middle" dominant-baseline="central">向高地址</text>
+<text x="570" y="762" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="400" text-anchor="middle" dominant-baseline="central">低地址</text>
+<line x1="60" y1="815" x2="1140" y2="815" stroke="#dce3ec" stroke-width="1"/>
+<text x="60" y="854" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400" text-anchor="start" dominant-baseline="central">简化示意：中间区域大小未指定，缓冲区与返回地址不一定紧邻。</text>
+<text x="60" y="890" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400" text-anchor="start" dominant-baseline="central">真实布局、对齐填充和保护机制，需要结合反汇编与调试确认。</text>
+</svg>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920">
+<title>格式化字符串参数读取顺序示意图</title>
+<desc>x86-64 System V ABI 下，printf 按 rdi、rsi、rdx、rcx、r8、r9 的顺序读取前六个参数，随后从调用栈由低地址向高地址读取后续槽位，最终进入 buf 所在位置。</desc>
+<rect width="1200" height="920" fill="#ffffff"/>
+<text x="60" y="67" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="40" font-weight="600" text-anchor="start" dominant-baseline="central">格式化字符串：printf 的参数读取顺序</text>
+<text x="60" y="127" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="400" text-anchor="start" dominant-baseline="central">x86-64 System V ABI 下，格式串中 % 说明符的取参位置</text>
+
+<!-- Left column: Register arguments -->
+<text x="295" y="192" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="middle" dominant-baseline="central">寄存器传递的前 6 个参数位</text>
+
+<rect x="60" y="225" width="470" height="85" fill="#f3f6fa"/>
+<text x="295" y="253" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="600" text-anchor="middle" dominant-baseline="central">rdi（第 1 个参数）</text>
+<text x="295" y="286" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="400" text-anchor="middle" dominant-baseline="central">格式串 buf 地址（不计入 % 序号）</text>
+
+<rect x="60" y="310" width="470" height="85" fill="#fff0df"/>
+<text x="295" y="352" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">rsi → 第 1 个 % 说明符（%1$p）</text>
+
+<rect x="60" y="395" width="470" height="85" fill="#fff0df"/>
+<text x="295" y="437" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">rdx → 第 2 个 % 说明符（%2$p）</text>
+
+<rect x="60" y="480" width="470" height="85" fill="#fff0df"/>
+<text x="295" y="522" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">rcx → 第 3 个 % 说明符（%3$p）</text>
+
+<rect x="60" y="565" width="470" height="85" fill="#fff0df"/>
+<text x="295" y="607" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">r8 → 第 4 个 % 说明符（%4$p）</text>
+
+<rect x="60" y="650" width="470" height="85" fill="#fff0df"/>
+<text x="295" y="692" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">r9 → 第 5 个 % 说明符（%5$p）</text>
+
+<rect x="60" y="225" width="470" height="510" fill="none" stroke="#a8b4c4" stroke-width="2"/>
+<line x1="60" y1="310" x2="530" y2="310" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="60" y1="395" x2="530" y2="395" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="60" y1="480" x2="530" y2="480" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="60" y1="565" x2="530" y2="565" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="60" y1="650" x2="530" y2="650" stroke="#a8b4c4" stroke-width="1.5"/>
+
+<!-- Transition arrow from r9 to stack slot 0 -->
+<line x1="538" y1="688" x2="590" y2="688" stroke="#b35b0b" stroke-width="4"/>
+<polygon points="604,688 586,678 586,698" fill="#b35b0b"/>
+
+<!-- Right column: Stack argument area -->
+<text x="810" y="192" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="middle" dominant-baseline="central">栈上参数区（高地址在上）</text>
+
+<rect x="610" y="225" width="400" height="220" fill="#e8f2ff"/>
+<text x="810" y="283" fill="#2366a8" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="33" font-weight="600" text-anchor="middle" dominant-baseline="central">buf[64]</text>
+<text x="810" y="338" fill="#2366a8" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="400" text-anchor="middle" dominant-baseline="central">从第 k 个 % 起读到用户输入</text>
+<text x="810" y="388" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="400" text-anchor="middle" dominant-baseline="central">例如 %k$p 读出 buf 前 8 字节</text>
+
+<rect x="610" y="445" width="400" height="100" fill="#f3f6fa"/>
+<text x="810" y="495" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="middle" dominant-baseline="central">其他栈上数据 / 填充</text>
+
+<rect x="610" y="545" width="400" height="95" fill="#fff0df"/>
+<text x="810" y="576" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">栈槽 1 → 第 7 个 %（%7$p）</text>
+<text x="810" y="612" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="400" text-anchor="middle" dominant-baseline="central">对应栈上第 2 个 8 字节槽位</text>
+
+<rect x="610" y="640" width="400" height="95" fill="#fff0df"/>
+<text x="810" y="671" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600" text-anchor="middle" dominant-baseline="central">栈槽 0 → 第 6 个 %（%6$p）</text>
+<text x="810" y="707" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="400" text-anchor="middle" dominant-baseline="central">r9 用尽后从此处开始读栈</text>
+
+<rect x="610" y="225" width="400" height="510" fill="none" stroke="#a8b4c4" stroke-width="2"/>
+<line x1="610" y1="445" x2="1010" y2="445" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="610" y1="545" x2="1010" y2="545" stroke="#a8b4c4" stroke-width="1.5"/>
+<line x1="610" y1="640" x2="1010" y2="640" stroke="#a8b4c4" stroke-width="1.5"/>
+
+<text x="810" y="772" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400" text-anchor="middle" dominant-baseline="central">低地址</text>
+
+<!-- Upward arrow on the far right -->
+<line x1="1045" y1="715" x2="1045" y2="265" stroke="#b35b0b" stroke-width="5"/>
+<polygon points="1045,245 1033,267 1057,267" fill="#b35b0b"/>
+<text x="1125" y="465" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="600" text-anchor="middle" dominant-baseline="central">取参方向</text>
+<text x="1125" y="505" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="middle" dominant-baseline="central">向高地址</text>
+
+<!-- Footer notes -->
+<line x1="60" y1="815" x2="1140" y2="815" stroke="#dce3ec" stroke-width="1"/>
+<text x="60" y="854" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400" text-anchor="start" dominant-baseline="central">简化示意：实际进入可变参数函数后寄存器值常会暂存至保存区，但 % 编号顺序不变。</text>
+<text x="60" y="890" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400" text-anchor="start" dominant-baseline="central">buf 对应的起始参数序号 k、字节对齐和中间栈帧内容，需要结合反汇编与调试确认。</text>
+</svg>

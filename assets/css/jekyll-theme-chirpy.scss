@@ -15,64 +15,67 @@
 /* append your custom style below */
 
 @mixin custom-light-palette {
-  --main-bg: #f6fbff;
-  --main-border-color: #dce9f5;
-  --sidebar-bg: #ebf4fc;
-  --sidebar-border-color: #d6e6f5;
-  --sidebar-hover-bg: rgb(14 165 233 / 12%);
+  --main-bg: #ffffff;
+  --main-border-color: #eaeff5;
+  --sidebar-bg: #f4f7fa;
+  --sidebar-border-color: #e6ecf2;
+  --sidebar-hover-bg: rgb(37 99 235 / 8%);
   --sidebar-active-color: #0f172a;
-  --topbar-bg: rgb(246 251 255 / 84%);
+  --topbar-bg: rgb(255 255 255 / 86%);
   --card-bg: #ffffff;
-  --card-hover-bg: #f1f7fe;
+  --card-hover-bg: #f8fafd;
   --card-shadow:
-    rgb(15 23 42 / 5%) 0 4px 14px 0, rgb(148 163 184 / 18%) 0 0 0 1px;
-  --text-color: #25324b;
-  --heading-color: #132038;
-  --text-muted-color: #60728f;
+    rgb(15 23 42 / 4%) 0 2px 10px 0, rgb(203 213 225 / 45%) 0 0 0 1px;
+  --text-color: #2c3440;
+  --heading-color: #18202c;
+  --text-muted-color: #64748b;
   --link-color: #0284c7;
-  --link-underline-color: #93c5fd;
-  --toc-highlight: #0d9488;
-  --highlight-bg-color: #eff6fc;
-  --language-border-color: #dbe8f5;
-  --inline-code-bg: rgb(14 165 233 / 10%);
+  --link-underline-color: #bae6fd;
+  --toc-highlight: #0284c7;
+  --highlight-bg-color: #f6f8fb;
+  --language-border-color: #e5ebf2;
+  --inline-code-bg: rgb(2 132 199 / 8%);
 }
 
 @mixin custom-dark-palette {
-  --main-bg: #151b2e;
-  --main-border-color: #2a3658;
-  --sidebar-bg: #111629;
-  --sidebar-border-color: #232d4c;
-  --sidebar-hover-bg: rgb(99 102 241 / 16%);
-  --sidebar-active-color: #f1f5ff;
-  --sidebar-muted-color: #96a7cc;
-  --site-title-color: #a5b4fc;
-  --site-subtitle-color: #8da2cb;
-  --topbar-bg: rgb(21 27 46 / 84%);
-  --topbar-text-color: #dbe5f8;
-  --search-border-color: #2e3b61;
-  --card-bg: #1b243c;
-  --card-header-bg: #202a46;
-  --card-hover-bg: #243050;
+  --main-bg: #22272e;
+  --main-border-color: #373e47;
+  --sidebar-bg: #1c2128;
+  --sidebar-border-color: #30363d;
+  --sidebar-hover-bg: rgb(83 155 245 / 12%);
+  --sidebar-active-color: #edf2f7;
+  --sidebar-muted-color: #9aa5b1;
+  --site-title-color: #cdd9e5;
+  --site-subtitle-color: #8b949e;
+  --topbar-bg: rgb(34 39 46 / 86%);
+  --topbar-text-color: #cdd9e5;
+  --search-border-color: #373e47;
+  --card-bg: #262c34;
+  --card-header-bg: #2b313a;
+  --card-hover-bg: #2d333b;
   --card-shadow:
-    rgb(5 8 20 / 36%) 0 6px 18px 0, rgb(99 102 241 / 20%) 0 0 0 1px;
-  --text-color: #dce6fa;
-  --heading-color: #f1f5ff;
-  --text-muted-color: #93a6cd;
-  --link-color: #5eead4;
-  --link-underline-color: #38bdf8;
-  --toc-highlight: #818cf8;
-  --highlight-bg-color: #0f1526;
-  --language-border-color: #283456;
-  --inline-code-bg: rgb(94 234 212 / 12%);
-  --code-color: #cbd5f5;
-  --tb-odd-bg: #192239;
-  --tb-even-bg: #151b2e;
-  --tb-border-color: #2a3658;
-  --tag-border: #33436e;
-  --tag-hover: #253152;
-  --search-tag-bg: #1e2845;
-  --btn-border-color: #2f3c63;
-  --button-bg: #1b243c;
+    rgb(0 0 0 / 22%) 0 4px 14px 0, rgb(68 76 86 / 55%) 0 0 0 1px;
+  --text-color: #cdd9e5;
+  --heading-color: #edf2f7;
+  --text-muted-color: #8b949e;
+  --link-color: #539bf5;
+  --link-underline-color: #386399;
+  --toc-highlight: #539bf5;
+  --highlight-bg-color: #1c2128;
+  --language-border-color: #373e47;
+  --code-header-muted-color: #2d333b;
+  --code-header-text-color: #8b949e;
+  --code-header-icon-color: #768390;
+  --inline-code-bg: rgb(110 118 129 / 22%);
+  --code-color: #cdd9e5;
+  --tb-odd-bg: #262c34;
+  --tb-even-bg: #22272e;
+  --tb-border-color: #373e47;
+  --tag-border: #3d444d;
+  --tag-hover: #2d333b;
+  --search-tag-bg: #262c34;
+  --btn-border-color: #373e47;
+  --button-bg: #262c34;
 }
 
 :root[data-bs-theme='light'] {
@@ -137,7 +140,7 @@ h5 {
 
 /* 侧栏头像与导航微调 */
 #sidebar #avatar {
-  box-shadow: 0 4px 16px rgb(99 102 241 / 18%);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
   transition: transform 0.25s ease;
 
   &:hover {
@@ -185,11 +188,18 @@ pre {
 }
 
 div.highlighter-rouge,
+figure.highlight,
+.highlight,
+.highlight .w {
+  background-color: var(--highlight-bg-color);
+}
+
+div.highlighter-rouge,
 figure.highlight {
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--language-border-color);
-  box-shadow: 0 4px 14px rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
 }
 
 /* 表格与示意图展示 */
@@ -203,7 +213,7 @@ article .content img[src$='.svg'] {
   margin: 1.5rem auto;
   border-radius: 10px;
   border: 1px solid var(--main-border-color);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 8%);
 }
 
 /* 右侧标签胶囊微调 */

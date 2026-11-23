@@ -56,7 +56,27 @@ int main(void)
 gcc -no-pie -fno-stack-protector -Wno-format-security chal1.c -o chal1
 ```
 
-拖进 IDA 后按 `F5` 查看 `vuln()` 伪代码，双击变量 `magic` 跳转到 `.bss` 段，即可看到它的地址为 `0x40403c`（写脚本时也可直接用 `elf.sym["magic"]`）。程序只有一次 `printf(buf)` 机会，需要一次性把 `magic` 改成 `0x1337beef`。
+拖进 IDA 按 `F5` 查看 `vuln()` 反编译伪代码：
+
+```c
+__int64 vuln()
+{
+  char buf[136]; // [rsp+0h] [rbp-90h] BYREF
+  ssize_t v1; // [rsp+88h] [rbp-8h]
+
+  v1 = read(0, buf, 0x7FuLL);
+  if ( v1 <= 0 )
+    return 0LL;
+  buf[v1] = 0;
+  printf(buf);
+  if ( magic == 0x1337BEEF )
+    return win();
+  else
+    return printf("\nmagic = 0x%x\n", (unsigned int)magic);
+}
+```
+
+在伪代码中双击全局变量 `magic`，跳转到 `.bss` 段即可看到地址为 `0x40403c`（写脚本时也可直接用 `elf.sym["magic"]`）。同时看 `buf` 的注释 `[rsp+0h]`：它紧贴栈顶（偏移为 `0`），按公式心算就是 `6 + 0 / 8 = 6`。程序只有一次 `printf(buf)` 机会，需要一次性把 `magic` 改成 `0x1337beef`。
 
 ### 分析与偏移计算
 
@@ -137,17 +157,39 @@ int main(void)
 gcc -no-pie -Wl,-z,relro -Wno-format-security chal2.c -o chal2
 ```
 
-因为是 Partial RELRO，GOT 表可写；`vuln()` 里有 `while (1)` 循环，支持多轮交互，但每次最多读入 127 字节。
+拖进 IDA 按 `F5` 查看 `vuln()` 反编译伪代码：
+
+```c
+unsigned __int64 vuln()
+{
+  ssize_t v1; // [rsp+8h] [rbp-98h]
+  char buf[136]; // [rsp+10h] [rbp-90h] BYREF
+  unsigned __int64 v2; // [rsp+98h] [rbp-8h]
+
+  v2 = __readfsqword(0x28u);
+  while ( 1 )
+  {
+    v1 = read(0, buf, 0x7FuLL);
+    if ( v1 <= 0 )
+      break;
+    buf[v1] = 0;
+    printf(buf);
+  }
+  return v2 - __readfsqword(0x28u);
+}
+```
+
+注意看 IDA 伪代码里 `buf` 的栈偏移变成了 `[rsp+10h]`（前面 `0x10` 字节被局部变量 `v1` 和栈对齐占掉了），直接心算就是 `6 + 0x10 / 8 = 8`。因为是 Partial RELRO，GOT 表可写；`vuln()` 里有 `while (1)` 循环，支持多轮交互，但每次最多读入 127 字节（`0x7F`）。
 
 ### 分析与利用步骤
 
-1. **重测偏移 `k`**：发 `AAAAAAAA.%p.%p.%p.%p.%p.%p.%p.%p` 探测，回显如下：
+1. **验证偏移 `k`**：发 `AAAAAAAA.%p.%p.%p.%p.%p.%p.%p.%p` 探测，回显如下：
 
 ```text
 AAAAAAAA.0x7ffdea214910.0x7ffdea214910.(nil).0x8.0x7924a6156380.0xa.0x21.0x4141414141414141
 ```
 
-这题在 IDA 栈视图里能看到除了 `buf` 外还有局部变量 `n` 与对齐空隙，因此 `0x4141414141414141` 顺延到了第 8 个位置（`k = 8`），不再是上一题的 `6`。
+`0x4141414141414141` 正好出现在第 8 个位置（`k = 8`），与 IDA 伪代码注释 `[rsp+10h]` 算出的结果完全一致。
 
 2. **第 1 轮：泄露 `puts@got` 算 libc 基址**：在 IDA 的 `Imports` 窗口（或双击 `puts` 跳转到 `.got.plt`）可以确认 `puts@got` 的位置，脚本中直接用 `elf.got["puts"]` 读取。`main()` 开头已经调用过 `puts("Welcome:")`，`puts@got` 中已经填入了真实的 libc 地址。构造 `"%9$sEND_"`（刚好 8 字节占满 `%8$`），后接 `p64(elf.got["puts"])`（落入 `%9$`）。收到回显后按 `END_` 截断解包出 `puts` 地址，减去 libc 偏移得到 `libc_base` 和 `system`。
 

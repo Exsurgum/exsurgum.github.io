@@ -56,7 +56,7 @@ int main(void)
 gcc -no-pie -fno-stack-protector -Wno-format-security chal1.c -o chal1
 ```
 
-通过 `nm chal1 | grep magic` 查得全局变量地址为 `0x40403c`。程序只有一次 `printf(buf)` 机会，需要一次性把 `magic` 改成 `0x1337beef`。
+拖进 IDA 后按 `F5` 查看 `vuln()` 伪代码，双击变量 `magic` 跳转到 `.bss` 段，即可看到它的地址为 `0x40403c`（写脚本时也可直接用 `elf.sym["magic"]`）。程序只有一次 `printf(buf)` 机会，需要一次性把 `magic` 改成 `0x1337beef`。
 
 ### 分析与偏移计算
 
@@ -147,9 +147,9 @@ gcc -no-pie -Wl,-z,relro -Wno-format-security chal2.c -o chal2
 AAAAAAAA.0x7ffdea214910.0x7ffdea214910.(nil).0x8.0x7924a6156380.0xa.0x21.0x4141414141414141
 ```
 
-这题由于多出循环内变量和栈帧对齐，`0x4141414141414141` 出现在第 8 个位置（`k = 8`），不再是上一题的 `6`。
+这题在 IDA 栈视图里能看到除了 `buf` 外还有局部变量 `n` 与对齐空隙，因此 `0x4141414141414141` 顺延到了第 8 个位置（`k = 8`），不再是上一题的 `6`。
 
-2. **第 1 轮：泄露 `puts@got` 算 libc 基址**：`main()` 开头已经调用过 `puts("Welcome:")`，`puts@got` 中已经填入了真实的 libc 地址。构造 `"%9$sEND_"`（刚好 8 字节占满 `%8$`），后接 `p64(elf.got["puts"])`（落入 `%9$`）。收到回显后按 `END_` 截断解包出 `puts` 地址，减去 libc 偏移得到 `libc_base` 和 `system`。
+2. **第 1 轮：泄露 `puts@got` 算 libc 基址**：在 IDA 的 `Imports` 窗口（或双击 `puts` 跳转到 `.got.plt`）可以确认 `puts@got` 的位置，脚本中直接用 `elf.got["puts"]` 读取。`main()` 开头已经调用过 `puts("Welcome:")`，`puts@got` 中已经填入了真实的 libc 地址。构造 `"%9$sEND_"`（刚好 8 字节占满 `%8$`），后接 `p64(elf.got["puts"])`（落入 `%9$`）。收到回显后按 `END_` 截断解包出 `puts` 地址，减去 libc 偏移得到 `libc_base` 和 `system`。
 
 3. **第 2 轮：改写 `printf@got` 为 `system`**：使用 `fmtstr_payload(8, {printf_got: system}, write_size="short")`。这里需要留意长度限制：若使用默认的 `write_size="byte"`，8 字节地址会拆出 6\~8 段写指令，总长度容易超过 127 字节；改用 `"short"` 按 2 字节拆成 3 段后，payload 远小于上限且写完立即生效。
 

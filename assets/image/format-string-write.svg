@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920">
+<title>格式化字符串改写数值原理示意图</title>
+<desc>展示 printf 内部计数器 count 如何随 %48879c 与 %8126c 累加，并由 %10$hn 与 %11$hn 将当前计数值分两次写入 target 的低 2 字节与高 2 字节，最终拼出 0xdeadbeef。</desc>
+<rect width="1200" height="920" fill="#ffffff"/>
+<text x="60" y="65" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="38" font-weight="600" text-anchor="start" dominant-baseline="central">为什么写一堆空格：%hn 的计数写入机制</text>
+<text x="60" y="120" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" dominant-baseline="central">%hn 没有“数值参数”，只能把 printf 累计输出的字符数 count 写进目标地址</text>
+
+<!-- Left row labels -->
+<text x="60" y="232" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="600" text-anchor="start" dominant-baseline="central">1. 输入 buf</text>
+<text x="60" y="264" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="400" text-anchor="start" dominant-baseline="central">从左到右扫描</text>
+
+<text x="60" y="362" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="600" text-anchor="start" dominant-baseline="central">2. 屏幕输出</text>
+<text x="60" y="394" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="400" text-anchor="start" dominant-baseline="central">补空格垫高计数</text>
+
+<text x="60" y="492" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="600" text-anchor="start" dominant-baseline="central">3. 计数器 count</text>
+<text x="60" y="524" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="400" text-anchor="start" dominant-baseline="central">只累加不清零</text>
+
+<!-- Column 1: %48879c -->
+<rect x="235" y="198" width="215" height="92" rx="8" fill="#e8f2ff" stroke="#7aaee8" stroke-width="2"/>
+<text x="342" y="230" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="27" font-weight="600" text-anchor="middle" dominant-baseline="central">%48879c</text>
+<text x="342" y="265" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">输入仅占 7 字节</text>
+
+<rect x="235" y="330" width="215" height="90" rx="8" fill="#f3f6fa" stroke="#a8b4c4" stroke-width="1.5"/>
+<text x="342" y="362" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">输出 48879 字符</text>
+<text x="342" y="394" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">48878 空格 + 1 字符</text>
+
+<rect x="235" y="462" width="215" height="84" rx="8" fill="#fff0df" stroke="#e09a52" stroke-width="2"/>
+<text x="342" y="491" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">0 → 48879</text>
+<text x="342" y="523" fill="#b35b0b" font-family="Consolas, Microsoft YaHei, monospace" font-size="20" font-weight="600" text-anchor="middle" dominant-baseline="central">(0xbeef)</text>
+
+<!-- Vertical flow Col 1 -->
+<line x1="342" y1="290" x2="342" y2="320" stroke="#7aaee8" stroke-width="3"/>
+<polygon points="342,328 335,317 349,317" fill="#7aaee8"/>
+<line x1="342" y1="420" x2="342" y2="452" stroke="#e09a52" stroke-width="3"/>
+<polygon points="342,460 335,449 349,449" fill="#e09a52"/>
+
+<!-- Column 2: %10$hn -->
+<rect x="475" y="198" width="205" height="92" rx="8" fill="#e8f2ff" stroke="#7aaee8" stroke-width="2"/>
+<text x="577" y="230" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="27" font-weight="600" text-anchor="middle" dominant-baseline="central">%10$hn</text>
+<text x="577" y="265" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">取槽位10地址写入</text>
+
+<rect x="475" y="330" width="205" height="90" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="577" y="362" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">不输出任何字符</text>
+<text x="577" y="394" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">只把 count 写回内存</text>
+
+<rect x="475" y="462" width="205" height="84" rx="8" fill="#fff0df" stroke="#b35b0b" stroke-width="2.5"/>
+<text x="577" y="491" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">当前 count = 48879</text>
+<text x="577" y="523" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="600" text-anchor="middle" dominant-baseline="central">写入 0xbeef ▼</text>
+
+<!-- Horizontal arrow Col 1 -> Col 2 -->
+<line x1="450" y1="504" x2="466" y2="504" stroke="#b35b0b" stroke-width="3"/>
+<polygon points="474,504 464,498 464,510" fill="#b35b0b"/>
+
+<!-- Column 3: %8126c -->
+<rect x="705" y="198" width="205" height="92" rx="8" fill="#e8f2ff" stroke="#7aaee8" stroke-width="2"/>
+<text x="807" y="230" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="27" font-weight="600" text-anchor="middle" dominant-baseline="central">%8126c</text>
+<text x="807" y="265" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">补足差值 57005-48879</text>
+
+<rect x="705" y="330" width="205" height="90" rx="8" fill="#f3f6fa" stroke="#a8b4c4" stroke-width="1.5"/>
+<text x="807" y="362" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">再输出 8126 字符</text>
+<text x="807" y="394" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">8125 空格 + 1 字符</text>
+
+<rect x="705" y="462" width="205" height="84" rx="8" fill="#fff0df" stroke="#e09a52" stroke-width="2"/>
+<text x="807" y="491" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">48879 + 8126</text>
+<text x="807" y="523" fill="#b35b0b" font-family="Consolas, Microsoft YaHei, monospace" font-size="20" font-weight="600" text-anchor="middle" dominant-baseline="central">= 57005 (0xdead)</text>
+
+<!-- Vertical flow Col 3 & Horizontal Col 2 -> Col 3 -->
+<line x1="807" y1="290" x2="807" y2="320" stroke="#7aaee8" stroke-width="3"/>
+<polygon points="807,328 800,317 814,317" fill="#7aaee8"/>
+<line x1="807" y1="420" x2="807" y2="452" stroke="#e09a52" stroke-width="3"/>
+<polygon points="807,460 800,449 814,449" fill="#e09a52"/>
+<line x1="680" y1="504" x2="696" y2="504" stroke="#b35b0b" stroke-width="3"/>
+<polygon points="704,504 694,498 694,510" fill="#b35b0b"/>
+
+<!-- Column 4: %11$hn -->
+<rect x="935" y="198" width="205" height="92" rx="8" fill="#e8f2ff" stroke="#7aaee8" stroke-width="2"/>
+<text x="1037" y="230" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="27" font-weight="600" text-anchor="middle" dominant-baseline="central">%11$hn</text>
+<text x="1037" y="265" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">取槽位11地址写入</text>
+
+<rect x="935" y="330" width="205" height="90" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1037" y="362" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">不输出任何字符</text>
+<text x="1037" y="394" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle" dominant-baseline="central">只把 count 写回内存</text>
+
+<rect x="935" y="462" width="205" height="84" rx="8" fill="#fff0df" stroke="#b35b0b" stroke-width="2.5"/>
+<text x="1037" y="491" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle" dominant-baseline="central">当前 count = 57005</text>
+<text x="1037" y="523" fill="#b35b0b" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="600" text-anchor="middle" dominant-baseline="central">写入 0xdead ▼</text>
+
+<line x1="910" y1="504" x2="926" y2="504" stroke="#b35b0b" stroke-width="3"/>
+<polygon points="934,504 924,498 924,510" fill="#b35b0b"/>
+
+<!-- Bottom target memory layout -->
+<text x="60" y="675" fill="#172b4d" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="600" text-anchor="start" dominant-baseline="central">4. 内存 target</text>
+<text x="60" y="708" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="400" text-anchor="start" dominant-baseline="central">小端序 4 字节</text>
+
+<rect x="235" y="642" width="452" height="108" rx="8" fill="#e8f2ff" stroke="#2366a8" stroke-width="2"/>
+<line x1="461" y1="642" x2="461" y2="750" stroke="#7aaee8" stroke-width="1.5"/>
+<text x="348" y="675" fill="#52627a" font-family="Consolas, Microsoft YaHei, monospace" font-size="20" font-weight="400" text-anchor="middle" dominant-baseline="central">0x404024</text>
+<text x="348" y="715" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="28" font-weight="600" text-anchor="middle" dominant-baseline="central">\xef</text>
+<text x="574" y="675" fill="#52627a" font-family="Consolas, Microsoft YaHei, monospace" font-size="20" font-weight="400" text-anchor="middle" dominant-baseline="central">0x404025</text>
+<text x="574" y="715" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="28" font-weight="600" text-anchor="middle" dominant-baseline="central">\xbe</text>
+
+<rect x="687" y="642" width="453" height="108" rx="8" fill="#e8f2ff" stroke="#2366a8" stroke-width="2"/>
+<line x1="913" y1="642" x2="913" y2="750" stroke="#7aaee8" stroke-width="1.5"/>
+<text x="800" y="675" fill="#52627a" font-family="Consolas, Microsoft YaHei, monospace" font-size="20" font-weight="400" text-anchor="middle" dominant-baseline="central">0x404026</text>
+<text x="800" y="715" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="28" font-weight="600" text-anchor="middle" dominant-baseline="central">\xad</text>
+<text x="1026" y="675" fill="#52627a" font-family="Consolas, Microsoft YaHei, monospace" font-size="20" font-weight="400" text-anchor="middle" dominant-baseline="central">0x404027</text>
+<text x="1026" y="715" fill="#2366a8" font-family="Consolas, Microsoft YaHei, monospace" font-size="28" font-weight="600" text-anchor="middle" dominant-baseline="central">\xde</text>
+
+<!-- Labels below memory -->
+<text x="461" y="777" fill="#2366a8" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" font-weight="600" text-anchor="middle" dominant-baseline="central">低 2 字节 = 0xbeef（第 1 次 %10$hn）</text>
+<text x="913" y="777" fill="#2366a8" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" font-weight="600" text-anchor="middle" dominant-baseline="central">高 2 字节 = 0xdead（第 2 次 %11$hn）</text>
+
+<!-- Arrows from %10$hn and %11$hn down to memory halves -->
+<polyline points="577,546 577,595 461,595 461,630" fill="none" stroke="#b35b0b" stroke-width="4"/>
+<polygon points="461,640 453,625 469,625" fill="#b35b0b"/>
+
+<polyline points="1037,546 1037,595 913,595 913,630" fill="none" stroke="#b35b0b" stroke-width="4"/>
+<polygon points="913,640 905,625 921,625" fill="#b35b0b"/>
+
+<!-- Footer notes -->
+<line x1="60" y1="818" x2="1140" y2="818" stroke="#dce3ec" stroke-width="1"/>
+<text x="60" y="855" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="400" text-anchor="start" dominant-baseline="central">正因为 %hn 只能写“已输出总字数”，无法直接传值，才用 %48879c 让 printf 自己吐出空格把计数垫高。</text>
+<text x="60" y="889" fill="#52627a" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" font-weight="400" text-anchor="start" dominant-baseline="central">结尾补齐的 AAAAAAA 与目标地址排在 %11$hn 之后，因此不会影响前面两次已经写入的值。</text>
+</svg>

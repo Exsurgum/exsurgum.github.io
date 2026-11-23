@@ -1,0 +1,133 @@
+---
+---
+
+@use 'abstracts/variables' with (
+  $theme: '{{ site.theme_mode }}'
+);
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* append your custom style below */
+
+body {
+  font-family:
+    'Source Sans Pro', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans CJK SC', sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family:
+    Lato, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans CJK SC', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* 主页文章卡片：更柔和的圆角与悬停微浮起 */
+#post-list .card {
+  border-radius: 12px;
+  border: 1px solid var(--main-border-color);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--link-underline-color);
+  }
+}
+
+#post-list .card .card-body .card-title {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+#post-list .card .card-body .card-text {
+  line-height: 1.65;
+}
+
+/* 侧栏头像与导航微调 */
+#sidebar #avatar {
+  box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+  transition: transform 0.25s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+}
+
+#sidebar ul li.nav-item a.nav-link {
+  border-radius: 8px;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+/* 文章正文阅读体验与排版节奏 */
+article .content {
+  font-size: 1.03rem;
+  line-height: 1.82;
+
+  > p,
+  > ul,
+  > ol {
+    margin-bottom: 1.15rem;
+  }
+
+  li + li {
+    margin-top: 0.35rem;
+  }
+
+  h2 {
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--main-border-color);
+  }
+
+  h3 {
+    padding-left: 0.65rem;
+    border-left: 3px solid var(--toc-highlight);
+  }
+}
+
+/* 代码块与行内代码 */
+code,
+pre {
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas,
+    'Microsoft YaHei', monospace;
+}
+
+div.highlighter-rouge,
+figure.highlight {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--main-border-color);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 4%);
+}
+
+/* 表格与示意图展示 */
+article .table-wrapper > table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+article .content img[src$='.svg'] {
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 10px;
+  border: 1px solid var(--main-border-color);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 6%);
+}
+
+/* 右侧标签胶囊微调 */
+.post-tag {
+  border-radius: 999px;
+}

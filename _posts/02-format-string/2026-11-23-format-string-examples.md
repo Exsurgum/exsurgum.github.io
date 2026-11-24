@@ -59,24 +59,28 @@ gcc -no-pie -fno-stack-protector -Wno-format-security chal1.c -o chal1
 拖进 IDA 按 `F5` 查看 `vuln()` 反编译伪代码：
 
 ```c
-__int64 vuln()
+int vuln()
 {
+  ssize_t v0; // rax
   char buf[136]; // [rsp+0h] [rbp-90h] BYREF
-  ssize_t v1; // [rsp+88h] [rbp-8h]
+  ssize_t v3; // [rsp+88h] [rbp-8h]
 
-  v1 = read(0, buf, 0x7FuLL);
-  if ( v1 <= 0 )
-    return 0LL;
-  buf[v1] = 0;
-  printf(buf);
-  if ( magic == 0x1337BEEF )
-    return win();
-  else
-    return printf("\nmagic = 0x%x\n", (unsigned int)magic);
+  v0 = read(fd: 0, buf, nbytes: 0x7Fu);
+  v3 = v0;
+  if ( v0 > 0 )
+  {
+    buf[v3] = 0;
+    printf(format: buf);
+    if ( magic == 322420463 )
+      LODWORD(v0) = win();
+    else
+      LODWORD(v0) = printf(format: "\nmagic = 0x%x\n", magic);
+  }
+  return v0;
 }
 ```
 
-在伪代码中双击全局变量 `magic`，跳转到 `.bss` 段即可看到地址为 `0x40403c`（写脚本时也可直接用 `elf.sym["magic"]`）。同时看 `buf` 的注释 `[rsp+0h]`：它紧贴栈顶（偏移为 `0`），按公式心算就是 `6 + 0 / 8 = 6`。程序只有一次 `printf(buf)` 机会，需要一次性把 `magic` 改成 `0x1337beef`。
+在伪代码中双击全局变量 `magic`，跳转到 `.bss` 段即可看到地址为 `0x40403c`（`322420463` 转成十六进制就是 `0x1337beef`；写脚本时也可直接用 `elf.sym["magic"]`）。同时看 `buf` 的注释 `[rsp+0h]`：它紧贴栈顶（偏移为 `0`），按公式心算就是 `6 + 0 / 8 = 6`。程序只有一次 `printf(buf)` 机会，需要一次性把 `magic` 改成 `0x1337beef`。
 
 ### 分析与偏移计算
 
@@ -164,18 +168,18 @@ unsigned __int64 vuln()
 {
   ssize_t v1; // [rsp+8h] [rbp-98h]
   char buf[136]; // [rsp+10h] [rbp-90h] BYREF
-  unsigned __int64 v2; // [rsp+98h] [rbp-8h]
+  unsigned __int64 v3; // [rsp+98h] [rbp-8h]
 
-  v2 = __readfsqword(0x28u);
+  v3 = __readfsqword(0x28u);
   while ( 1 )
   {
-    v1 = read(0, buf, 0x7FuLL);
+    v1 = read(fd: 0, buf, nbytes: 0x7Fu);
     if ( v1 <= 0 )
       break;
     buf[v1] = 0;
-    printf(buf);
+    printf(format: buf);
   }
-  return v2 - __readfsqword(0x28u);
+  return v3 - __readfsqword(0x28u);
 }
 ```
 

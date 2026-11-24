@@ -53,9 +53,7 @@ void vuln(void)
 
 ![](/assets/image/format-string-args.svg)
 
-图中下方按传参顺序列出寄存器参数位，上方为栈上参数区（高地址在上、低地址在下）。由于被调函数 `printf` 的栈帧位于低地址、调用者 `vuln` 的栈帧位于高地址，`overflow_arg_area` 向高地址步进的路线恰好会走进 `vuln()` 的局部变量区——只要步进到 `buf` 所在位置，`printf` 就会把用户自己写入 `buf` 的字节当成参数读出来。
-
-> 在 32 位 x86（`cdecl` 调用约定）下没有寄存器传参，所有参数全部按 4 字节对齐压在栈上：`[esp]` 为返回地址，`[esp+4]` 为格式串指针，`[esp+8]` 起便是第 1 个说明符读取的位置，取参从头到尾都在同一段连续栈空间内完成。
+图中下方按传参顺序列出寄存器参数位，上方为栈上参数区（高地址在上、低地址在下）。由于被调函数 `printf` 的栈帧位于低地址、调用者 `vuln` 的栈帧位于高地址，`overflow_arg_area` 向高地址步进的路线恰好会走进 `vuln()` 的局部变量区——只要步进到 `buf` 所在位置，`printf` 就会把用户自己写入 `buf` 的字节当成参数读出来。更多参数寄存器与 `va_list` 布局细节可查阅 [System V AMD64 ABI 规范](https://gitlab.com/x86-psABIs/x86-64-ABI)。
 
 ### 说明符怎样触发读、解引用与计数写回
 
@@ -166,7 +164,7 @@ payload = fmtstr_payload(offset, writes, numbwritten=0, write_size='byte')
 - `offset`：对齐后的起始参数序号 `k`。
 - `writes`：`{目标地址: 目标值}` 字典，支持同时写多个地址，如 `{elf.got["printf"]: system_addr}`。
 - `numbwritten`：可控输入前，本次 `printf` 已提前输出的固定字节数（没有前缀则填 `0`）。
-- `write_size`：写入粒度，默认 `'byte'`（`%hhn`，按 1 字节写）；遇到输入长度卡得很紧时，可改成 `'short'`（`%hn`，按 2 字节写）减少分段和末尾地址数量，或只修改目标地址变化的低 2\~4 字节。
+- `write_size`：写入粒度，默认 `'byte'`（`%hhn`，按 1 字节写）；遇到输入长度卡得很紧时，可改成 `'short'`（`%hn`，按 2 字节写）减少分段和末尾地址数量，或只修改目标地址变化的低 2\~4 字节。更多 `FmtStr` 自动探测与参数细节见 [pwntools fmtstr 官方文档](https://docs.pwntools.com/en/stable/fmtstr.html)。
 
 ## 保护机制与漏洞修复
 
@@ -219,10 +217,12 @@ void safe(void)
 
 - **改写程序变量**：修改决定程序分支的全局标志位或局部变量。
 - **改写 GOT 表（Partial RELRO）**：把后续会调用的库函数 GOT 表项（如 `printf@got`）改写为 `system` 或 one_gadget。例如把 `printf@got` 改成 `system` 后，下一轮输入 `"/bin/sh"` 调用 `printf(buf)` 就会执行 `system("/bin/sh")`。
-- **改写返回地址（Full RELRO）**：GOT 表只读时，先泄露栈地址算出返回地址位置，再用 `%n` 分段覆盖返回地址跳转到目标代码或 ROP 链。
+- **改写返回地址（Full RELRO）**：GOT 表只读时，先泄露栈地址算出返回地址位置，再用 `%n` 分段覆盖返回地址跳转到目标代码或 ROP 链（ROP 链与调用约束见 [01.0 栈溢出概述](/posts/stsck-overflow/)）。
 
 对于开启 Partial RELRO、关闭 PIE 且存在循环触发的二进制（假设测得 `k = 6`），标准三步利用流程为：
 
 1. **泄露 libc**：发送 `"%7$sEND_" + p64(elf.got["puts"])`，解包出 `puts` 真实地址并算出 `libc_base` 和 `system` 地址。
 2. **改写 GOT**：发送 `fmtstr_payload(6, {elf.got["printf"]: system_addr}, write_size="short")`，将 `printf@got` 改写为 `system`（高版本 glibc 下执行 `system` 需注意调用点栈按 16 字节对齐，若意外崩溃可排查调用前栈帧或改用 `one_gadget` / 栈迁移）。
 3. **获取 Shell**：下一轮输入 `"/bin/sh\x00"`，程序调用 `printf(buf)` 时触发 `system("/bin/sh")`。
+
+更完整的源码、反编译对照与可运行脚本见下一篇 [02.1 格式化字符串经典例题](/posts/format-string-examples/)；若遇到非栈格式化字符串或盲打场景，可进一步参考 [CTF Wiki - 格式化字符串漏洞](https://ctf-wiki.org/pwn/linux/user-mode/fmtstr/fmtstr-intro/)。

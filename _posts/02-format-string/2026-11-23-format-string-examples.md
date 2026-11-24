@@ -5,7 +5,7 @@ categories: [Pwn笔记, 第02章 格式化字符串]
 tags: [format-string, got-hijack, pwntools]
 ---
 
-本文结合两道经典题型，串起前一篇的偏移定位、大小序分段写、`%k$s` 任意读和 `fmtstr_payload` 改写 GOT 表。两道题均在 Ubuntu x86-64 下实测编译打通。
+本文结合两道经典题型，串起 [02.0 格式化字符串漏洞概述](/posts/format-string/) 中的偏移定位、大小序分段写、`%k$s` 任意读和 `fmtstr_payload` 改写 GOT 表。两道题均在 Ubuntu x86-64 下实测编译打通。
 
 ## 例题一：改写全局变量触发后门
 

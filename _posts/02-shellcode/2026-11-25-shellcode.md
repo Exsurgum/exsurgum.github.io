@@ -125,4 +125,4 @@ GCC 编译出的 Linux 程序默认开启栈不可执行（NX）。用 `readelf 
 2. **坚持 `W^X` 原则**：编译阶段不关闭栈保护和 NX（避免使用 `-z execstack`）；动态生成代码（如 JIT）时，先以 `RW` 写入，完成后用 `mprotect` 切换为 `R-X`，不要让同一页长期同时持有 `W` 和 `X` 权限。
 3. **收窄进程权限**：对解析外部复杂输入的服务启用 `seccomp` 白名单，禁用 `execve`、`fork` 等高危系统调用，配合 `-fPIE -pie -Wl,-z,relro,-z,now` 提高整体利用门槛。
 
-`pwntools` 常用工具（`asm`/`disasm`/`shellcraft`）和基础汇编写法见下一篇：[02.1 Pwn 中的 Shellcode 工具与基础汇编写法](/posts/shellcode-tools/)。
+`pwntools` 常用工具和基础汇编写法见 [02.1 Pwn 中的 Shellcode 工具与基础汇编写法](/posts/shellcode-tools/)，常见题型结构框架见 [02.2 常见 Shellcode 场景与写法框架](/posts/shellcode-patterns/)。

@@ -1,7 +1,7 @@
 ---
-title: "02.0 格式化字符串漏洞概述"
+title: "03.0 格式化字符串漏洞概述"
 description: "介绍格式化字符串漏洞的成因、参数解析与读写原理，以及偏移定位、payload 构造、常见利用方向和修复方法。"
-categories: [Pwn笔记, 第02章 格式化字符串]
+categories: [Pwn笔记, 第03章 格式化字符串]
 tags: [format-string, printf]
 ---
 
@@ -122,7 +122,7 @@ buf[8..15] (槽位 %7$): \x08\x20\x40\x00\x00\x00\x00\x00  (p64(0x402008))
 payload = b"%7$sAAAA" + p64(0x402008)
 ```
 
-`printf` 先解析 `%7$s` 解引用 `0x402008` 输出 `secret_data`，再原样打印 `AAAA` 及地址中的可见字符 `\x08\x20\x40`，遇到高位 `\x00` 停止，最终输出 `secret_dataAAAA  @`。实战中常把 `"AAAA"` 换成 `"END_"` 之类的分隔标记方便脚本切片。
+`printf` 先解析 `%7$s` 解引用 `0x402008` 输出 `secret_data`，再原样打印 `AAAA` 和地址低位字节 `\x08\x20\x40`（遇到高位 `\x00` 才停止），把末尾输出混进控制字符和符号。实战中常把 `"AAAA"` 换成 `"END_"` 之类的分隔标记，脚本里用 `recvuntil(b"END_", drop=True)` 就能干净切出前面的内容。
 
 `%s` 有两个容易踩的点。槽位里的值不是有效指针时进程直接段错误退出，没有第二次机会，盲打时先用 `%p` 确认槽位内容再换 `%s`。目标地址的低 6 字节里如果有 `\x00`，输出会在那里提前截断，`u64` 之前一定先看长度。泄露 GOT 时 `puts@got` 撞上这两种情况，换一个已经解析过的函数（如 `read@got`）再试。
 
@@ -221,7 +221,7 @@ void safe(void)
 
 - **改写程序变量**：修改决定程序分支的全局标志位或局部变量。
 - **改写 GOT 表（Partial RELRO）**：把后续会调用的库函数 GOT 表项（如 `printf@got`）改写为 `system` 或 one_gadget。例如把 `printf@got` 改成 `system` 后，下一轮输入 `"/bin/sh"` 调用 `printf(buf)` 就会执行 `system("/bin/sh")`。
-- **改写返回地址（Full RELRO）**：GOT 表只读时，先泄露栈地址算出返回地址位置，再用 `%n` 分段覆盖返回地址跳转到目标代码或 ROP 链（栈帧布局、偏移计算与完整例题见 [01.0 栈溢出概述](/posts/stack-overflow/) 和 [01.1 栈溢出经典例题](/posts/stack-overflow-examples/)）。
+- **改写返回地址（Full RELRO）**：GOT 表只读时，先泄露栈地址算出返回地址位置，再用 `%n` 分段覆盖返回地址跳转到目标代码或 ROP 链（栈帧布局与偏移计算见 [01.0 栈溢出概述](/posts/stack-overflow/)）。
 
 对于开启 Partial RELRO、关闭 PIE 且存在循环触发的二进制（假设测得 `k = 6`），标准三步利用流程为：
 
@@ -229,4 +229,4 @@ void safe(void)
 2. **改写 GOT**：发送 `fmtstr_payload(6, {elf.got["printf"]: system_addr}, write_size="short")`，将 `printf@got` 改写为 `system`（高版本 glibc 下执行 `system` 需注意调用点栈按 16 字节对齐，若意外崩溃可排查调用前栈帧或改用 `one_gadget` / 栈迁移）。
 3. **获取 Shell**：下一轮输入 `"/bin/sh\x00"`，程序调用 `printf(buf)` 时触发 `system("/bin/sh")`。
 
-更完整的源码、反编译对照与可运行脚本见下一篇 [02.1 格式化字符串经典例题](/posts/format-string-examples/)；若遇到非栈格式化字符串或盲打场景，可进一步参考 [CTF Wiki - 格式化字符串漏洞](https://ctf-wiki.org/pwn/linux/user-mode/fmtstr/fmtstr-intro/)。
+更完整的源码、反编译对照与可运行脚本见下一篇 [03.1 格式化字符串经典例题](/posts/format-string-examples/)；若遇到非栈格式化字符串或盲打场景，可进一步参考 [CTF Wiki - 格式化字符串漏洞](https://ctf-wiki.org/pwn/linux/user-mode/fmtstr/fmtstr-intro/)。

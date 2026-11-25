@@ -1,5 +1,6 @@
 ---
 title: "02.0 Shellcode 概述"
+date: 2026-11-25 01:00:00 +0800
 description: "介绍 Shellcode 的基本概念、位置无关要求、x86-64 系统调用约定、坏字符限制，以及 NX 与 Seccomp 等防护机制。"
 categories: [Pwn笔记, 第02章 Shellcode]
 tags: [shellcode, syscall, nx, seccomp]
@@ -123,3 +124,5 @@ GCC 编译出的 Linux 程序默认开启栈不可执行（NX）。用 `readelf 
 1. **修复根源漏洞**：参考 [01.0 栈溢出概述](/posts/stack-overflow/) 和 [03.0 格式化字符串漏洞概述](/posts/format-string/)，从源头校验输入边界与格式串，不给劫持控制流的机会。
 2. **坚持 `W^X` 原则**：编译阶段不关闭栈保护和 NX（避免使用 `-z execstack`）；动态生成代码（如 JIT）时，先以 `RW` 写入，完成后用 `mprotect` 切换为 `R-X`，不要让同一页长期同时持有 `W` 和 `X` 权限。
 3. **收窄进程权限**：对解析外部复杂输入的服务启用 `seccomp` 白名单，禁用 `execve`、`fork` 等高危系统调用，配合 `-fPIE -pie -Wl,-z,relro,-z,now` 提高整体利用门槛。
+
+汇编语法、工具链使用以及常用位置无关编码写法见后续两篇：[02.1 Shellcode 汇编语法与常用工具](/posts/shellcode-tools/) 和 [02.2 Shellcode 常用汇编写法](/posts/shellcode-patterns/)。
